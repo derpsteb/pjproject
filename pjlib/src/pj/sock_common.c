@@ -809,6 +809,8 @@ PJ_DEF(pj_status_t) pj_gethostip(int af, pj_sockaddr *addr)
     /* May not be used if TRACE_ is disabled */
     PJ_UNUSED_ARG(strip);
 
+	printf("sock_common.c: L812\n");
+
 #ifdef _MSC_VER
     /* Get rid of "uninitialized he variable" with MS compilers */
     pj_bzero(&ai, sizeof(ai));
@@ -821,6 +823,7 @@ PJ_DEF(pj_status_t) pj_gethostip(int af, pj_sockaddr *addr)
 	cand_addr[i].addr.sa_family = (pj_uint16_t)af;
 	PJ_SOCKADDR_RESET_LEN(&cand_addr[i]);
     }
+	printf("sock_common.c: L826\n");
 
     addr->addr.sa_family = (pj_uint16_t)af;
     PJ_SOCKADDR_RESET_LEN(addr);
@@ -851,6 +854,7 @@ PJ_DEF(pj_status_t) pj_gethostip(int af, pj_sockaddr *addr)
 #else
     PJ_UNUSED_ARG(ai);
 #endif
+	printf("sock_common.c: L857\n");
 
     /* Get default interface (interface for default route) */
     if (cand_cnt < PJ_ARRAY_SIZE(cand_addr)) {
@@ -872,6 +876,7 @@ PJ_DEF(pj_status_t) pj_gethostip(int af, pj_sockaddr *addr)
 	    }
 	}
     }
+	printf("sock_common.c: L879\n");
 
 
     /* Enumerate IP interfaces */
@@ -880,10 +885,12 @@ PJ_DEF(pj_status_t) pj_gethostip(int af, pj_sockaddr *addr)
 	count = PJ_ARRAY_SIZE(cand_addr) - start_if;
 
 	status = pj_enum_ip_interface(af, &count, &cand_addr[start_if]);
+	printf("sock_common.c: L888\n");
 	if (status == PJ_SUCCESS && count) {
 	    /* Clear the port number */
 	    for (i=0; i<count; ++i)
 		pj_sockaddr_set_port(&cand_addr[start_if+i], 0);
+		printf("sock_common.c: L893\n");
 
 	    /* For each candidate that we found so far (that is the hostname
 	     * address and default interface address, check if they're found
@@ -924,11 +931,12 @@ PJ_DEF(pj_status_t) pj_gethostip(int af, pj_sockaddr *addr)
 	    }
 	}
     }
-
+	printf("sock_common.c: L932\n");
     /* Apply weight adjustment for special IPv4/IPv6 addresses
      * See http://trac.pjsip.org/repos/ticket/1046
      */
     if (af == PJ_AF_INET) {
+	printf("sock_common.c: L937\n");
 	for (i=0; i<cand_cnt; ++i) {
 	    unsigned j;
 	    for (j=0; j<PJ_ARRAY_SIZE(spec_ipv4); ++j) {
@@ -943,6 +951,8 @@ PJ_DEF(pj_status_t) pj_gethostip(int af, pj_sockaddr *addr)
 	    }
 	}
     } else if (af == PJ_AF_INET6) {
+	printf("sock_common.c: L952\n");
+
 	for (i=0; i<PJ_ARRAY_SIZE(spec_ipv6); ++i) {
 		unsigned j;
 		for (j=0; j<cand_cnt; ++j) {
@@ -962,11 +972,13 @@ PJ_DEF(pj_status_t) pj_gethostip(int af, pj_sockaddr *addr)
 		}
 	}
     } else {
+	printf("sock_common.c: L973\n");
 	return PJ_EAFNOTSUP;
     }
 
     /* Enumerate candidates to get the best IP address to choose */
     selected_cand = -1;
+	printf("sock_common.c: L979\n");
     for (i=0; i<cand_cnt; ++i) {
 	TRACE_((THIS_FILE, "Checking candidate IP %s, weight=%d",
 		pj_sockaddr_print(&cand_addr[i], strip, sizeof(strip), 3),
@@ -981,7 +993,7 @@ PJ_DEF(pj_status_t) pj_gethostip(int af, pj_sockaddr *addr)
 	else if (cand_weight[i] > cand_weight[selected_cand])
 	    selected_cand = i;
     }
-
+	printf("sock_common.c: L994\n");
     /* If else fails, returns loopback interface as the last resort */
     if (selected_cand == -1) {
 	if (af==PJ_AF_INET) {
@@ -1000,6 +1012,7 @@ PJ_DEF(pj_status_t) pj_gethostip(int af, pj_sockaddr *addr)
 	TRACE_((THIS_FILE, "Candidate %s selected",
 		pj_sockaddr_print(addr, strip, sizeof(strip), 3)));
     }
+	printf("sock_common.c: L1013\n");
 
     return PJ_SUCCESS;
 }

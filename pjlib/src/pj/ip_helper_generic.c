@@ -71,18 +71,21 @@ static pj_status_t if_enum_by_af(int af,
 				 unsigned *p_cnt,
 				 pj_sockaddr ifs[])
 {
+	printf("ip_helper_generic.c: L74\n");
     struct ifaddrs *ifap = NULL, *it;
     unsigned max;
 
     PJ_ASSERT_RETURN(af==PJ_AF_INET || af==PJ_AF_INET6, PJ_EINVAL);
-    
+	printf("ip_helper_generic.c: L79\n");
     TRACE_((THIS_FILE, "Starting interface enum with getifaddrs() for af=%d",
 	    af));
-
+	printf("ip_helper_generic.c: L82\n");
     if (getifaddrs(&ifap) != 0) {
+	printf("ip_helper_generic.c: L84\n");
 	TRACE_((THIS_FILE, " getifarrds() failed: %s", get_os_errmsg()));
 	return PJ_RETURN_OS_ERROR(pj_get_netos_error());
     }
+	printf("ip_helper_generic.c: L88\n");
 
     it = ifap;
     max = *p_cnt;
@@ -119,13 +122,17 @@ static pj_status_t if_enum_by_af(int af,
 	/* Ignore 0.0.0.0/8 address. This is a special address
 	 * which doesn't seem to have practical use.
 	 */
+	printf("ip_helper_generic.c: L125\n");
 	if (af==pj_AF_INET() &&
 	    (pj_ntohl(((pj_sockaddr_in*)ad)->sin_addr.s_addr) >> 24) == 0)
 	{
+	printf("ip_helper_generic.c: L129\n");
 	    TRACE_((THIS_FILE, "  address %s ignored (0.0.0.0/8 class)", 
 		    get_addr(ad), ad->sa_family));
 	    continue;
 	}
+	printf("ip_helper_generic.c: L134\n");
+
 
 	TRACE_((THIS_FILE, "  address %s (af=%d) added at index %d", 
 		get_addr(ad), ad->sa_family, *p_cnt));
@@ -136,7 +143,10 @@ static pj_status_t if_enum_by_af(int af,
 	(*p_cnt)++;
     }
 
+	printf("ip_helper_generic.c: L146\n");
+
     freeifaddrs(ifap);
+	printf("ip_helper_generic.c: L149\n");
     TRACE_((THIS_FILE, "done, found %d address(es)", *p_cnt));
     return (*p_cnt != 0) ? PJ_SUCCESS : PJ_ENOTFOUND;
 }
@@ -149,6 +159,7 @@ static pj_status_t if_enum_by_af(int af,
 				 unsigned *p_cnt,
 				 pj_sockaddr ifs[])
 {
+	printf("ip_helper_generic.c: L153\n");
     pj_sock_t sock;
     char buf[512];
     struct ifconf ifc;
@@ -247,6 +258,7 @@ static pj_status_t if_enum_by_af(int af,
 /* Note: this does not work with IPv6 */
 static pj_status_t if_enum_by_af(int af, unsigned *p_cnt, pj_sockaddr ifs[])
 {
+	printf("ip_helper_generic.c: L252\n");
     struct if_nameindex *if_list;
     struct ifreq ifreq;
     pj_sock_t sock;
@@ -342,14 +354,19 @@ static pj_status_t if_enum_by_af(int af,
 				 unsigned *p_cnt,
 				 pj_sockaddr ifs[])
 {
+	printf("ip_helper_generic.c: L345\n");
     pj_status_t status;
+	
 
     PJ_ASSERT_RETURN(p_cnt && *p_cnt > 0 && ifs, PJ_EINVAL);
+	printf("ip_helper_generic.c: L350\n");
 
     pj_bzero(ifs, sizeof(ifs[0]) * (*p_cnt));
 
     /* Just get one default route */
+	printf("ip_helper_generic.c: L352\n");
     status = pj_getdefaultipinterface(af, &ifs[0]);
+	printf("ip_helper_generic.c: L354\n");
     if (status != PJ_SUCCESS)
 	return status;
 
@@ -367,20 +384,26 @@ PJ_DEF(pj_status_t) pj_enum_ip_interface(int af,
 {
     unsigned start;
     pj_status_t status;
+	printf("ip_helper_generic.c: L370\n");
 
     start = 0;
     if (af==PJ_AF_INET6 || af==PJ_AF_UNSPEC) {
+	printf("ip_helper_generic.c: L374\n");
 	unsigned max = *p_cnt;
 	status = if_enum_by_af(PJ_AF_INET6, &max, &ifs[start]);
+	printf("ip_helper_generic.c: L377\n");
+
 	if (status == PJ_SUCCESS) {
 	    start += max;
 	    (*p_cnt) -= max;
 	}
     }
-
+	printf("ip_helper_generic.c: L384\n");
     if (af==PJ_AF_INET || af==PJ_AF_UNSPEC) {
 	unsigned max = *p_cnt;
+	printf("ip_helper_generic.c: L387\n");
 	status = if_enum_by_af(PJ_AF_INET, &max, &ifs[start]);
+	printf("ip_helper_generic.c: L389\n");
 	if (status == PJ_SUCCESS) {
 	    start += max;
 	    (*p_cnt) -= max;

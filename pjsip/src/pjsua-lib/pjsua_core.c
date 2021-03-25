@@ -868,22 +868,31 @@ static void init_random_seed(void)
     unsigned seed=0;
 
     /* Add hostname */
+	PJ_LOG(4,(THIS_FILE, "debug str 10"));
     hostname = pj_gethostname();
     seed = pj_hash_calc(seed, hostname->ptr, (int)hostname->slen);
 
     /* Add primary IP address */
+	PJ_LOG(4,(THIS_FILE, "debug str 11"));
+
     if (pj_gethostip(pj_AF_INET(), &addr)==PJ_SUCCESS)
 	seed = pj_hash_calc(seed, &addr.ipv4.sin_addr, 4);
 
     /* Get timeofday */
+	PJ_LOG(4,(THIS_FILE, "debug str 12"));
+
     pj_gettimeofday(&t);
     seed = pj_hash_calc(seed, &t, sizeof(t));
 
     /* Add PID */
+	PJ_LOG(4,(THIS_FILE, "debug str 13"));
+
     pid = pj_getpid();
     seed = pj_hash_calc(seed, &pid, sizeof(pid));
 
     /* Init random seed */
+	PJ_LOG(4,(THIS_FILE, "debug str 14"));
+
     pj_srand(seed);
 }
 
@@ -905,9 +914,12 @@ PJ_DEF(pj_status_t) pjsua_create(void)
     PJ_ASSERT_RETURN(status == PJ_SUCCESS, status);
 
     pj_log_push_indent();
+	PJ_LOG(4,(THIS_FILE, "debug str 0"));
 
     /* Init random seed */
     init_random_seed();
+
+	PJ_LOG(4,(THIS_FILE, "debug str 1"));
 
     /* Init PJLIB-UTIL: */
     status = pjlib_util_init();
